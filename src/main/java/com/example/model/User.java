@@ -26,8 +26,16 @@ public class User {
     @Column(nullable = false)
     private String password;
 
-    private String name;
+    @Column(name = "first_name", nullable = false)
+    private String firstName;
 
+    @Column(name = "last_name", nullable = false)
+    private String lastName;
+
+    @Column(name = "completed_intro")
+    private Boolean completedIntro = false;
+
+    @Column(name = "notification_enabled")
     private boolean notificationEnabled;
 
     // TODO relationships

@@ -1,4 +1,5 @@
 package com.example.model;
+import com.example.model.enumerations.JournalPromptType;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;

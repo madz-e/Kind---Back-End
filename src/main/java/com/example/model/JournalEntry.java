@@ -1,4 +1,5 @@
 package com.example.model;
+import com.example.model.enumerations.EntryType;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -23,21 +24,18 @@ public class JournalEntry {
     @Column(nullable = false)
     private String content;
 
-    // TODO empty, prompt, ANT
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private JournalType type;
+    private EntryType type;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    //TODO optional
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "mood_entry_id", unique = true)
     private MoodEntry moodEntry; // Relationship: One-to-One with MoodEntry (Optional)
 
-    //TODO optional (nullable = true)
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "prompt_id")
     private JournalPrompt journalPrompt; // Relationship: Many-to-One wi
