@@ -5,6 +5,8 @@ import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
+
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
@@ -19,7 +21,7 @@ public class MoodEntry {
     private Long id;
 
     @Column(nullable = false)
-    private LocalDateTime entryDateTime;
+    private LocalDate date;
 
     // TODO max the field to 10 - validation
     @Column(nullable = false)
@@ -54,4 +56,12 @@ public class MoodEntry {
     // TODO optional!!!
     @OneToOne(mappedBy = "moodEntry", fetch = FetchType.LAZY)
     private JournalEntry journalEntry;
+
+    // Automatically calculates category when setting mood value
+    public void setMoodValue(Integer moodValue) {
+        this.moodValue = moodValue;
+        this.moodCategory = MoodCategory.fromValue(moodValue);
+    }
 }
+
+
