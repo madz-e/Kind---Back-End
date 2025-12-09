@@ -1,5 +1,6 @@
 package com.example.model;
 
+import com.example.model.enumerations.MoodCategory;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
