@@ -18,7 +18,7 @@ public class JournalEntry {
     private Long id;
 
     @Column(nullable = false)
-    private LocalDate dateCreated;
+    private LocalDate createdAt;
 
     private String title;
 

@@ -29,7 +29,7 @@ public interface JournalEntryRepository extends JpaRepository<JournalEntry, Long
 
     // Word frequency analysis: Get all journal content for processing
     @Query("SELECT j.content FROM JournalEntry j WHERE j.user.id = :userId " +
-            "AND j.dateCreated BETWEEN :startDate AND :endDate")
+            "AND j.createdAt BETWEEN :startDate AND :endDate")
 
     List<String> findAllContentByUserIdAndDateRange(@Param("userId") Long userId,
                                                     @Param("startDate") LocalDateTime startDate,
