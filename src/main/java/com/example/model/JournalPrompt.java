@@ -18,7 +18,7 @@ public class JournalPrompt {
 
     // This holds the main prompt question (for GENERAL) or the title (for ANT_EXERCISE)
     @Lob
-    @Column(nullable = false)
+    @Column(nullable = false, columnDefinition = "TEXT")
     private String promptText;
 
     @Enumerated(EnumType.STRING)
@@ -26,9 +26,21 @@ public class JournalPrompt {
     private JournalPromptType type;
 
     // This holds the 7 structured questions only for the ANT_EXERCISE type.
-    @Lob
-    @Column(nullable = true)
-    private String prefilledQuestions;
+    public String[] getQuestions() {
+        if (type == JournalPromptType.ANT_EXERCISE) {
+            return new String[]{
+                    "What happened?",
+                    "What emotions did I feel at the time? How intense were they?",
+                    "What went through my mind?",
+                    "Facts that support this thought?",
+                    "Facts that provide evidence against this thought?",
+                    "What can be an alternative thought?",
+                    "How do I feel now?"
+            };
+        } else {
+            return new String[]{promptText};
+        }
+    }
 
     @OneToMany(mappedBy = "journalPrompt")
     private Set<JournalEntry> journalEntries;
