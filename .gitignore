@@ -24,3 +24,6 @@ pom.xml.versionsBackup
 # Local database files
 *.db
 *.local.xml
+
+# Application properties
+src/main/resources/application.properties
