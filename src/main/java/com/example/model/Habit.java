@@ -28,6 +28,9 @@ public class Habit {
     @Column(nullable = false)
     private LocalDate creationDate;
 
+    @Column(name = "is_system_habit", nullable = false)
+    private Boolean isSystemHabit = false;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
