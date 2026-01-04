@@ -14,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -33,20 +34,56 @@ public class JournalEntryServiceImpl implements JournalEntryService {
         // Validate user exists
         User user = userRepository.findById(journalEntry.getUser().getId())
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));
-
         journalEntry.setUser(user);
 
-        // Validate and set journal prompt if present
-        if (journalEntry.getJournalPrompt() != null && journalEntry.getJournalPrompt().getId() != null) {
-            JournalPrompt prompt = journalPromptRepository.findById(journalEntry.getJournalPrompt().getId())
-                    .orElseThrow(() -> new IllegalArgumentException("JournalPrompt not found"));
-            journalEntry.setJournalPrompt(prompt);
+        // Set created date if not provided
+        if (journalEntry.getCreatedAt() == null) {
+            journalEntry.setCreatedAt(LocalDate.now());
         }
 
-        // Validate and set mood entry if present
+        // Validate entry type is provided
+        if (journalEntry.getType() == null) {
+            throw new IllegalArgumentException("Entry type must be specified: BLANK or PROMPT_BASED");
+        }
+
+        // Validate content is provided (required for all types)
+        if (journalEntry.getContent() == null || journalEntry.getContent().trim().isEmpty()) {
+            throw new IllegalArgumentException("Content cannot be empty");
+        }
+
+        // Handle validation and relationships based on entry type
+        switch (journalEntry.getType()) {
+            case BLANK:
+                // BLANK entries: User provides their own title, no prompt allowed
+                if (journalEntry.getTitle() == null || journalEntry.getTitle().trim().isEmpty()) {
+                    throw new IllegalArgumentException("Title is required for BLANK journal entries");
+                }
+                // Ensure no prompt is associated with blank entries
+                journalEntry.setJournalPrompt(null);
+                break;
+
+            case PROMPT_BASED:
+                // PROMPT_BASED entries: Must have a prompt (either GENERAL or ANT_EXERCISE)
+                if (journalEntry.getJournalPrompt() == null || journalEntry.getJournalPrompt().getId() == null) {
+                    throw new IllegalArgumentException("Journal prompt is required for PROMPT_BASED entries");
+                }
+
+                JournalPrompt prompt = journalPromptRepository.findById(journalEntry.getJournalPrompt().getId())
+                        .orElseThrow(() -> new IllegalArgumentException("JournalPrompt not found with id: " + journalEntry.getJournalPrompt().getId()));
+                journalEntry.setJournalPrompt(prompt);
+
+                // Title is optional for prompt-based entries (the prompt provides context)
+                // No need to differentiate between GENERAL and ANT_EXERCISE here - the prompt type handles that
+                break;
+
+            default:
+                throw new IllegalArgumentException("Unknown entry type: " + journalEntry.getType());
+        }
+
+        // Optional mood entry relationship (can be present for any entry type)
         if (journalEntry.getMoodEntry() != null && journalEntry.getMoodEntry().getId() != null) {
             MoodEntry moodEntry = moodEntryRepository.findById(journalEntry.getMoodEntry().getId())
-                    .orElseThrow(() -> new IllegalArgumentException("MoodEntry not found"));
+                    .orElseThrow(() -> new IllegalArgumentException("MoodEntry not found with id: " + journalEntry.getMoodEntry().getId()));
             journalEntry.setMoodEntry(moodEntry);
         }
 
@@ -78,24 +115,31 @@ public class JournalEntryServiceImpl implements JournalEntryService {
     }
 
     @Override
-    public JournalEntry updateJournalEntry(Long id, JournalEntry journalEntry) {
+    public JournalEntry updateJournalEntry(Long id, JournalEntry updatedEntry) {
         JournalEntry existingEntry = journalEntryRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("JournalEntry not found with id: " + id));
 
-        existingEntry.setTitle(journalEntry.getTitle());
-        existingEntry.setContent(journalEntry.getContent());
-        existingEntry.setType(journalEntry.getType());
-
-        // Update journal prompt if provided
-        if (journalEntry.getJournalPrompt() != null && journalEntry.getJournalPrompt().getId() != null) {
-            JournalPrompt prompt = journalPromptRepository.findById(journalEntry.getJournalPrompt().getId())
-                    .orElseThrow(() -> new IllegalArgumentException("JournalPrompt not found"));
-            existingEntry.setJournalPrompt(prompt);
+        // Update content (always allowed)
+        if (updatedEntry.getContent() != null && !updatedEntry.getContent().trim().isEmpty()) {
+            existingEntry.setContent(updatedEntry.getContent());
         }
 
+        // Update title based on entry type
+        if (existingEntry.getType() == EntryType.BLANK) {
+            // For BLANK entries, title is required and can be updated
+            if (updatedEntry.getTitle() != null && !updatedEntry.getTitle().trim().isEmpty()) {
+                existingEntry.setTitle(updatedEntry.getTitle());
+            } else if (updatedEntry.getTitle() != null && updatedEntry.getTitle().trim().isEmpty()) {
+                throw new IllegalArgumentException("Title cannot be empty for BLANK journal entries");
+            }
+        } else if (existingEntry.getType() == EntryType.PROMPT_BASED) {
+            // For PROMPT_BASED entries, title is optional and can be updated
+            if (updatedEntry.getTitle() != null) {
+                existingEntry.setTitle(updatedEntry.getTitle());
+            }
+        }
         return journalEntryRepository.save(existingEntry);
     }
-
     @Override
     public void deleteJournalEntry(Long id) {
         if (!journalEntryRepository.existsById(id)) {
