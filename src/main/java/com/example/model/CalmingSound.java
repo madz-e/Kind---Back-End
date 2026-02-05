@@ -23,6 +23,6 @@ public class CalmingSound {
     @Column(nullable = false)
     private boolean loopEnabled;
 
-    @OneToMany(mappedBy = "sound")
+    @OneToMany(mappedBy = "sound", fetch = FetchType.LAZY)
     private Set<MindfulnessExercise> exercises;
 }
