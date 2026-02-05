@@ -1,9 +1,9 @@
-package com.example.service;
+package com.example.service.impl;
 
 import com.example.model.Habit;
 import com.example.model.User;
 import com.example.jpaRepository.HabitRepository;
-import com.example.jpaRepository.UserRepository;
+import com.example.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

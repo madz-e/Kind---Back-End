@@ -1,7 +1,7 @@
 package com.example.controller;
 
 import com.example.model.Affirmation;
-import com.example.service.AffirmationService;
+import com.example.service.impl.AffirmationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

@@ -1,7 +1,7 @@
 package com.example.controller;
 
 import com.example.model.Habit;
-import com.example.service.HabitService;
+import com.example.service.impl.HabitService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

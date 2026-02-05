@@ -1,18 +1,16 @@
-package com.example.service;
+package com.example.service.impl;
 
 import com.example.model.Reminder;
 import com.example.model.User;
 import com.example.model.Affirmation;
 import com.example.model.enumerations.ReminderType;
 import com.example.jpaRepository.ReminderRepository;
-import com.example.jpaRepository.UserRepository;
-import com.example.jpaRepository.AffirmationRepository;
+import com.example.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalTime;
-import java.util.Arrays;
 import java.util.List;
 
 @Service
@@ -30,7 +28,7 @@ public class ReminderService {
     @Transactional
     public Reminder createReminder(Reminder reminder) {
         // Validate and get user using UserService
-        User user = userService.findById(reminder.getUser().getId());
+        User user = userService.findById(reminder.getUser().getId()).orElseThrow(); //todo custom exception?
         reminder.setUser(user);
 
         // If it's an affirmation reminder, validate affirmation
@@ -126,7 +124,7 @@ public class ReminderService {
     public Reminder createAffirmationReminder(Long userId, Long affirmationId,
                                               LocalTime timeOfDay, String daysOfWeek) {
         // Get user and affirmation through services
-        User user = userService.findById(userId);
+        User user = userService.findById(userId).orElseThrow(); //todo custom exception?
         Affirmation affirmation = affirmationService.getAffirmationById(affirmationId);
 
         // Create reminder
@@ -148,7 +146,7 @@ public class ReminderService {
     @Transactional
     public Reminder createGeneralReminder(Long userId, LocalTime timeOfDay,
                                           String daysOfWeek, String message) {
-        User user = userService.findById(userId);
+        User user = userService.findById(userId).orElseThrow();//todo custom exception?
 
         Reminder reminder = new Reminder();
         reminder.setUser(user);

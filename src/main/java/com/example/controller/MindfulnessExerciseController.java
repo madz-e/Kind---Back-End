@@ -2,7 +2,7 @@ package com.example.controller;
 
 import com.example.model.MindfulnessExercise;
 import com.example.model.enumerations.ExerciseType;
-import com.example.service.MindfulnessExerciseService;
+import com.example.service.impl.MindfulnessExerciseService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

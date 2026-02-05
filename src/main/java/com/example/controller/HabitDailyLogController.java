@@ -1,7 +1,7 @@
 package com.example.controller;
 
 import com.example.model.HabitDailyLog;
-import com.example.service.HabitDailyLogService;
+import com.example.service.impl.HabitDailyLogService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;

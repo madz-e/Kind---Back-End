@@ -1,16 +1,14 @@
-package com.example.service;
+package com.example.service.impl;
 
 import com.example.model.MindfulnessExercise;
 import com.example.model.CalmingSound;
 import com.example.model.enumerations.ExerciseType;
 import com.example.jpaRepository.MindfulnessExerciseRepository;
-import com.example.jpaRepository.CalmingSoundRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor

@@ -2,7 +2,7 @@ package com.example.controller;
 
 import com.example.model.CalmingSound;
 import com.example.model.MindfulnessExercise;
-import com.example.service.CalmingSoundService;
+import com.example.service.impl.CalmingSoundService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

@@ -1,4 +1,4 @@
-package com.example.service;
+package com.example.service.impl;
 
 import com.example.jpaRepository.AffirmationRepository;
 import com.example.model.Affirmation;
