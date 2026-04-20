@@ -29,10 +29,10 @@ public class CalmingSoundController {
      * HAS TO BE CALLED FOR CALMING SOUNDS TO WORK
      * Response:
      * {
-     *   "success": true,
-     *   "message": "Default calming sounds initialized",
-     *   "count": 5,
-     *   "timestamp": "2024-01-15T14:30:00"
+     * "success": true,
+     * "message": "Default calming sounds initialized",
+     * "count": 5,
+     * "timestamp": "2024-01-15T14:30:00"
      * }
      */
     @PostMapping("/init")
@@ -73,8 +73,8 @@ public class CalmingSoundController {
      * Includes a "No Sound" option
      * Response:
      * [
-     *   { "id": null, "name": "No Sound", "loopEnabled": false, "isDefault": true },
-     *   { "id": 1, "name": "Gentle Rain", "loopEnabled": true, "isDefault": false }
+     * { "id": null, "name": "No Sound", "loopEnabled": false, "isDefault": true },
+     * { "id": 1, "name": "Gentle Rain", "loopEnabled": true, "isDefault": false }
      * ]
      */
     @GetMapping("/dropdown")
@@ -105,13 +105,13 @@ public class CalmingSoundController {
      * Get detailed statistics about a sound
      * Response:
      * {
-     *   "id": 1,
-     *   "name": "Gentle Rain",
-     *   "usageCount": 3,
-     *   "loopEnabled": true,
-     *   "createdDate": "2024-01-15T10:00:00",
-     *   "fileSize": "2.5 MB",
-     *   "usedInExercises": [...]
+     * "id": 1,
+     * "name": "Gentle Rain",
+     * "usageCount": 3,
+     * "loopEnabled": true,
+     * "createdDate": "2024-01-15T10:00:00",
+     * "fileSize": "2.5 MB",
+     * "usedInExercises": [...]
      * }
      */
     @GetMapping("/{id}/statistics")
@@ -132,9 +132,9 @@ public class CalmingSoundController {
      * POST /api/calming-sounds/upload
      * Create a new calming sound with audio file upload
      * Request: multipart/form-data
-     *   - name: String (sound name)
-     *   - audioFile: File (audio file: mp3, wav, ogg, m4a)
-     *   - loopEnabled: boolean (default: true)
+     * - name: String (sound name)
+     * - audioFile: File (audio file: mp3, wav, ogg, m4a)
+     * - loopEnabled: boolean (default: true)
      */
     @PostMapping("/upload")
     public ResponseEntity<Map<String, Object>> createCalmingSound(
@@ -173,8 +173,8 @@ public class CalmingSoundController {
      * Does NOT update the audio file
      * Request Body (optional fields):
      * {
-     *   "name": "New Sound Name",
-     *   "loopEnabled": false
+     * "name": "New Sound Name",
+     * "loopEnabled": false
      * }
      */
     @PutMapping("/{id}")
@@ -201,8 +201,8 @@ public class CalmingSoundController {
      * Bulk update loop settings for multiple sounds
      * Request Body:
      * {
-     *   "soundIds": [1, 2, 3],
-     *   "loopEnabled": true
+     * "soundIds": [1, 2, 3],
+     * "loopEnabled": true
      * }
      */
     @PatchMapping("/bulk-loop")

@@ -1,8 +1,8 @@
 package com.example.service.impl;
 
+import com.example.jpaRepository.HabitRepository;
 import com.example.model.Habit;
 import com.example.model.User;
-import com.example.jpaRepository.HabitRepository;
 import com.example.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

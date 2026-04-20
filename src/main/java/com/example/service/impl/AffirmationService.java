@@ -15,8 +15,6 @@ import java.util.Optional;
 @RequiredArgsConstructor
 @Transactional
 public class AffirmationService {
-    private final AffirmationRepository affirmationRepository;
-
     // Pre-set affirmations as backup
     private static final List<String> DEFAULT_AFFIRMATIONS = Arrays.asList(
             "I am worthy of love and respect.",
@@ -35,6 +33,7 @@ public class AffirmationService {
             "I let go of what no longer serves me.",
             "I am creating a life I love."
     );
+    private final AffirmationRepository affirmationRepository;
 
     // 1. Get random affirmation (for daily affirmation)
     public Affirmation getRandomAffirmation() {
@@ -147,7 +146,6 @@ public class AffirmationService {
         fallback.setAffirmationText("You are enough just as you are.");
         return fallback;
     }
-
 
 
 }

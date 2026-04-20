@@ -43,10 +43,10 @@ public class AffirmationController {
      * Returns different affirmation each time
      * Response:
      * {
-     *   "success": true,
-     *   "id": 3,
-     *   "text": "My potential is limitless.",
-     *   "timestamp": "2024-01-15T14:30:00"
+     * "success": true,
+     * "id": 3,
+     * "text": "My potential is limitless.",
+     * "timestamp": "2024-01-15T14:30:00"
      * }
      */
     @GetMapping("/random")
@@ -67,11 +67,11 @@ public class AffirmationController {
      * Get today's affirmation (same all day)
      * Response:
      * {
-     *   "success": true,
-     *   "id": 3,
-     *   "text": "My potential is limitless.",
-     *   "date": "2024-01-15",
-     *   "timestamp": "2024-01-15T14:30:00"
+     * "success": true,
+     * "id": 3,
+     * "text": "My potential is limitless.",
+     * "date": "2024-01-15",
+     * "timestamp": "2024-01-15T14:30:00"
      * }
      */
     @GetMapping("/today")

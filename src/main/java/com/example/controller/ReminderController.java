@@ -74,15 +74,15 @@ public class ReminderController {
      * Create a new reminder
      * Request Body:
      * {
-     *   "user": { "id": 1 },
-     *   "timeOfDay": "09:00:00",
-     *   "daysOfWeek": "MON,TUE,WED,THU,FRI",
-     *   "type": "GENERAL",
-     *   "message": "Time for your morning meditation",
-     *   "enabled": true,
-     *   "linkedAffirmation": null // or { "id": 3 } for AFFIRMATION type
+     * "user": { "id": 1 },
+     * "timeOfDay": "09:00:00",
+     * "daysOfWeek": "MON,TUE,WED,THU,FRI",
+     * "type": "GENERAL",
+     * "message": "Time for your morning meditation",
+     * "enabled": true,
+     * "linkedAffirmation": null // or { "id": 3 } for AFFIRMATION type
      * }
-     *
+     * <p>
      * Available types: AFFIRMATION, MEDITATION, HABIT, JOURNAL, GENERAL
      */
     @PostMapping
@@ -117,10 +117,10 @@ public class ReminderController {
      * Create an affirmation reminder (convenience endpoint)
      * Request Body:
      * {
-     *   "userId": 1,
-     *   "affirmationId": 3,
-     *   "timeOfDay": "09:00:00",
-     *   "daysOfWeek": "MON,TUE,WED,THU,FRI"
+     * "userId": 1,
+     * "affirmationId": 3,
+     * "timeOfDay": "09:00:00",
+     * "daysOfWeek": "MON,TUE,WED,THU,FRI"
      * }
      */
     @PostMapping("/affirmation")
@@ -158,10 +158,10 @@ public class ReminderController {
      * Create a general reminder (convenience endpoint)
      * Request Body:
      * {
-     *   "userId": 1,
-     *   "timeOfDay": "14:00:00",
-     *   "daysOfWeek": "MON,WED,FRI",
-     *   "message": "Time to journal your thoughts"
+     * "userId": 1,
+     * "timeOfDay": "14:00:00",
+     * "daysOfWeek": "MON,WED,FRI",
+     * "message": "Time to journal your thoughts"
      * }
      */
     @PostMapping("/general")
@@ -199,10 +199,10 @@ public class ReminderController {
      * Update an existing reminder
      * Request Body: (all fields optional except those you want to update)
      * {
-     *   "timeOfDay": "10:00:00",
-     *   "daysOfWeek": "MON,TUE,WED",
-     *   "enabled": false,
-     *   "message": "Updated message"
+     * "timeOfDay": "10:00:00",
+     * "daysOfWeek": "MON,TUE,WED",
+     * "enabled": false,
+     * "message": "Updated message"
      * }
      */
     @PutMapping("/{id}")
@@ -265,8 +265,8 @@ public class ReminderController {
      * Get all available reminder types
      * Response:
      * {
-     *   "types": ["AFFIRMATION", "MEDITATION", "HABIT", "JOURNAL", "GENERAL"],
-     *   "timestamp": "2024-01-15T14:30:00"
+     * "types": ["AFFIRMATION", "MEDITATION", "HABIT", "JOURNAL", "GENERAL"],
+     * "timestamp": "2024-01-15T14:30:00"
      * }
      */
     @GetMapping("/types")

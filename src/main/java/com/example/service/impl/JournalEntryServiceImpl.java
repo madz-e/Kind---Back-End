@@ -1,13 +1,13 @@
 package com.example.service.impl;
 
 import com.example.jpaRepository.JournalEntryRepository;
-import com.example.jpaRepository.UserRepository;
 import com.example.jpaRepository.JournalPromptRepository;
 import com.example.jpaRepository.MoodEntryRepository;
+import com.example.jpaRepository.UserRepository;
 import com.example.model.JournalEntry;
-import com.example.model.User;
 import com.example.model.JournalPrompt;
 import com.example.model.MoodEntry;
+import com.example.model.User;
 import com.example.model.enumerations.EntryType;
 import com.example.service.JournalEntryService;
 import lombok.RequiredArgsConstructor;
@@ -140,6 +140,7 @@ public class JournalEntryServiceImpl implements JournalEntryService {
         }
         return journalEntryRepository.save(existingEntry);
     }
+
     @Override
     public void deleteJournalEntry(Long id) {
         if (!journalEntryRepository.existsById(id)) {

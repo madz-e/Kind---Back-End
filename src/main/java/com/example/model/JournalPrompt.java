@@ -1,9 +1,11 @@
 package com.example.model;
+
 import com.example.model.enumerations.JournalPromptType;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.AllArgsConstructor;
+
 import java.util.Set;
 
 @Entity
@@ -24,6 +26,8 @@ public class JournalPrompt {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private JournalPromptType type;
+    @OneToMany(mappedBy = "journalPrompt")
+    private Set<JournalEntry> journalEntries;
 
     // This holds the 7 structured questions only for the ANT_EXERCISE type.
     public String[] getQuestions() {
@@ -41,7 +45,4 @@ public class JournalPrompt {
             return new String[]{promptText};
         }
     }
-
-    @OneToMany(mappedBy = "journalPrompt")
-    private Set<JournalEntry> journalEntries;
 }

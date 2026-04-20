@@ -1,9 +1,11 @@
 package com.example.model;
+
 import com.example.model.enumerations.ReminderType;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.AllArgsConstructor;
+
 import java.time.LocalTime;
 
 @Entity

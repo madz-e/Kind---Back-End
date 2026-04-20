@@ -4,8 +4,8 @@ import com.example.model.Emotion;
 import com.example.model.enumerations.MoodCategory;
 import com.example.service.EmotionService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;

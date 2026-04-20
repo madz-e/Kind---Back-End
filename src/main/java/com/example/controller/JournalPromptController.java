@@ -4,8 +4,8 @@ import com.example.model.JournalPrompt;
 import com.example.model.enumerations.JournalPromptType;
 import com.example.service.JournalPromptService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -34,7 +34,7 @@ public class JournalPromptController {
     // GET prompts by type (GENERAL or ANT_EXERCISE)
     @GetMapping("/type/{type}")
     public ResponseEntity<List<JournalPrompt>> getPromptsByType(
-            @PathVariable JournalPromptType type)   {
+            @PathVariable JournalPromptType type) {
 
         List<JournalPrompt> prompts = journalPromptService.findByType(type);
         return ResponseEntity.ok(prompts);
@@ -46,6 +46,7 @@ public class JournalPromptController {
         JournalPrompt savedPrompt = journalPromptService.createPrompt(prompt);
         return ResponseEntity.status(HttpStatus.CREATED).body(savedPrompt);
     }
+
     // TODO: Admin only
     @PutMapping("/{id}")
     public ResponseEntity<JournalPrompt> updatePrompt(

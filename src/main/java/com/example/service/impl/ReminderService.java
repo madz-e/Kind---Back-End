@@ -1,10 +1,10 @@
 package com.example.service.impl;
 
+import com.example.jpaRepository.ReminderRepository;
+import com.example.model.Affirmation;
 import com.example.model.Reminder;
 import com.example.model.User;
-import com.example.model.Affirmation;
 import com.example.model.enumerations.ReminderType;
-import com.example.jpaRepository.ReminderRepository;
 import com.example.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
