@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
@@ -82,7 +83,7 @@ public class AffirmationController {
         response.put("success", true);
         response.put("id", affirmation.getId());
         response.put("text", affirmation.getAffirmationText());
-        response.put("date", java.time.LocalDate.now().toString());
+        response.put("date", LocalDate.now().toString());
         response.put("timestamp", LocalDateTime.now().toString());
 
         return ResponseEntity.ok(response);

@@ -2,6 +2,9 @@ package com.example.service.impl;
 
 import com.example.jpaRepository.AffirmationRepository;
 import com.example.model.Affirmation;
+import com.example.model.exceptions.AffirmationNotFoundException;
+import com.example.model.exceptions.EmptyAffirmationTextException;
+import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -33,7 +36,15 @@ public class AffirmationService {
             "I let go of what no longer serves me.",
             "I am creating a life I love."
     );
+
     private final AffirmationRepository affirmationRepository;
+
+    @PostConstruct
+    public void init() {
+        if (affirmationRepository.count() == 0) {
+            initializeDefaultAffirmations();
+        }
+    }
 
     // 1. Get random affirmation (for daily affirmation)
     public Affirmation getRandomAffirmation() {
@@ -46,16 +57,10 @@ public class AffirmationService {
 
         // If database is empty, check if we should initialize it
         if (affirmationRepository.count() == 0) {
-            // Initialize with defaults
             initializeDefaultAffirmations();
-
-            // Try again after initialization
-            return affirmationRepository.findRandom()
-                    .orElse(getFallbackAffirmation());
         }
-
-        // Database exists but findRandom returned empty (shouldn't happen)
-        return getFallbackAffirmation();
+        return affirmationRepository.findRandom()
+                .orElseThrow(() -> new RuntimeException("No affirmations found after initialization"));
     }
 
     // 2. Get all affirmations
@@ -87,11 +92,12 @@ public class AffirmationService {
      * Uses day of year to pick consistent affirmation
      */
     public Affirmation getTodaysAffirmation() {
-        // Get all affirmations
-        List<Affirmation> allAffirmations = getAllAffirmations();
+        List<Affirmation> allAffirmations = affirmationRepository.findAll();
 
+        // If database is empty, try to initialize it
         if (allAffirmations.isEmpty()) {
-            return getFallbackAffirmation();
+            initializeDefaultAffirmations();
+            allAffirmations = affirmationRepository.findAll();
         }
 
         // Use day of year to pick consistent affirmation per day
@@ -104,19 +110,22 @@ public class AffirmationService {
     // 3. Get affirmation by ID
     public Affirmation getAffirmationById(Long id) {
         return affirmationRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Affirmation not found with id: " + id));
+                .orElseThrow(() -> new AffirmationNotFoundException(id));
     }
 
     // 4. Save new affirmation
     public Affirmation createAffirmation(Affirmation affirmation) {
         if (affirmation.getAffirmationText() == null || affirmation.getAffirmationText().trim().isEmpty()) {
-            throw new IllegalArgumentException("Affirmation text cannot be empty");
+            throw new EmptyAffirmationTextException(affirmation.getAffirmationText());
         }
         return affirmationRepository.save(affirmation);
     }
 
     // 5. Update affirmation
     public Affirmation updateAffirmation(Long id, String newText) {
+        if (newText == null || newText.trim().isEmpty()) {
+            throw new EmptyAffirmationTextException(newText);
+        }
         Affirmation affirmation = getAffirmationById(id);
         affirmation.setAffirmationText(newText);
         return affirmationRepository.save(affirmation);
@@ -127,25 +136,7 @@ public class AffirmationService {
     public void deleteAffirmation(Long id) {
         // Check if affirmation exists
         Affirmation affirmation = getAffirmationById(id);
-
-        // Check if it's being used in any reminders
-        if (!affirmation.getReminders().isEmpty()) {
-            throw new IllegalStateException("Cannot delete affirmation. It is being used in " +
-                    affirmation.getReminders().size() + " reminder(s).");
-        }
-
         affirmationRepository.deleteById(id);
     }
-
-    /**
-     * Fallback affirmation if everything else fails
-     */
-    private Affirmation getFallbackAffirmation() {
-        Affirmation fallback = new Affirmation();
-        fallback.setId(0L);
-        fallback.setAffirmationText("You are enough just as you are.");
-        return fallback;
-    }
-
 
 }

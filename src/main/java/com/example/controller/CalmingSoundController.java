@@ -38,12 +38,8 @@ public class CalmingSoundController {
     @PostMapping("/init")
     public ResponseEntity<Map<String, Object>> initializeCalmingSounds() {
         calmingSoundService.initializeDefaultSounds();
-
-        Map<String, Object> response = new HashMap<>();
-        response.put("success", true);
-        response.put("message", "Default calming sounds initialized");
-        response.put("count", calmingSoundService.getAllCalmingSounds().size());
-        response.put("timestamp", LocalDateTime.now().toString());
+        Map<String, Object> response = buildSuccessResponse("Default calming sounds initialized",
+                Map.of("count", calmingSoundService.getAllCalmingSounds().size()));
 
         return ResponseEntity.ok(response);
     }
@@ -144,26 +140,15 @@ public class CalmingSoundController {
 
         try {
             CalmingSound sound = calmingSoundService.createCalmingSound(name, audioFile, loopEnabled);
+            return ResponseEntity.status(HttpStatus.CREATED)
+                    .body(buildSuccessResponse("Calming sound created successfully", sound));
 
-            Map<String, Object> response = new HashMap<>();
-            response.put("success", true);
-            response.put("message", "Calming sound created successfully");
-            response.put("sound", sound);
-            response.put("timestamp", LocalDateTime.now().toString());
-
-            return ResponseEntity.status(HttpStatus.CREATED).body(response);
         } catch (IOException e) {
-            Map<String, Object> error = new HashMap<>();
-            error.put("success", false);
-            error.put("error", "Failed to upload audio file: " + e.getMessage());
-            error.put("timestamp", LocalDateTime.now().toString());
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(buildErrorResponse("Failed to upload audio file: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR));
         } catch (RuntimeException e) {
-            Map<String, Object> error = new HashMap<>();
-            error.put("success", false);
-            error.put("error", e.getMessage());
-            error.put("timestamp", LocalDateTime.now().toString());
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(buildErrorResponse(e.getMessage(), HttpStatus.BAD_REQUEST));
         }
     }
 
@@ -215,14 +200,12 @@ public class CalmingSoundController {
 
         int updatedCount = calmingSoundService.bulkUpdateLoopSettings(soundIds, loopEnabled);
 
-        Map<String, Object> response = new HashMap<>();
-        response.put("success", true);
-        response.put("updatedCount", updatedCount);
-        response.put("loopEnabled", loopEnabled);
-        response.put("timestamp", LocalDateTime.now().toString());
+        Map<String, Object> data = Map.of(
+                "updatedCount", updatedCount,
+                "loopEnabled", loopEnabled
+        );
 
-        return ResponseEntity.ok(response);
-    }
+        return ResponseEntity.ok(buildSuccessResponse("Loop settings updated", data));    }
 
     /**
      * DELETE /api/calming-sounds/{id}
@@ -233,19 +216,29 @@ public class CalmingSoundController {
     public ResponseEntity<Map<String, Object>> deleteCalmingSound(@PathVariable Long id) {
         try {
             calmingSoundService.deleteCalmingSound(id);
-
-            Map<String, Object> response = new HashMap<>();
-            response.put("success", true);
-            response.put("message", "Calming sound deleted successfully");
-            response.put("timestamp", LocalDateTime.now().toString());
-
-            return ResponseEntity.ok(response);
+            return ResponseEntity.ok(buildSuccessResponse("Calming sound deleted successfully",null));
         } catch (RuntimeException e) {
-            Map<String, Object> error = new HashMap<>();
-            error.put("success", false);
-            error.put("error", e.getMessage());
-            error.put("timestamp", LocalDateTime.now().toString());
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(buildErrorResponse(e.getMessage(), HttpStatus.BAD_REQUEST));
         }
+    }
+
+    private Map<String, Object> buildSuccessResponse(String message, Object data) {
+        Map<String, Object> response = new HashMap<>();
+        response.put("success", true);
+        response.put("message", message);
+        response.put("timestamp", LocalDateTime.now().toString());
+        if (data != null) {
+            response.put("data", data);
+        }
+        return response;
+    }
+
+    private Map<String, Object> buildErrorResponse(String message, HttpStatus status) {
+        Map<String, Object> error = new HashMap<>();
+        error.put("success", false);
+        error.put("error", message);
+        error.put("timestamp", LocalDateTime.now().toString());
+        return error;
     }
 }
