@@ -3,6 +3,7 @@ package com.example.service.impl;
 import com.example.jpaRepository.HabitRepository;
 import com.example.model.Habit;
 import com.example.model.User;
+import com.example.model.exceptions.HabitNotFoundException;
 import com.example.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -40,7 +41,7 @@ public class HabitService {
     // 1. Get single habit (simple)
     public Habit getHabitById(Long habitId) {
         return habitRepository.findById(habitId)
-                .orElseThrow(() -> new RuntimeException("Habit not found"));
+                .orElseThrow(() -> new HabitNotFoundException(habitId));
     }
 
     // 3. Delete ANY habit (user can delete premade or custom)
