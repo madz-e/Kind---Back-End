@@ -5,6 +5,7 @@ import com.example.model.Affirmation;
 import com.example.model.Reminder;
 import com.example.model.User;
 import com.example.model.enumerations.ReminderType;
+import com.example.model.exceptions.ReminderNotFoundException;
 import com.example.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -57,7 +58,7 @@ public class ReminderService {
     @Transactional(readOnly = true)
     public Reminder getReminderById(Long id) {
         return reminderRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Reminder not found with id: " + id));
+                .orElseThrow(() -> new ReminderNotFoundException(id));
     }
 
     /**

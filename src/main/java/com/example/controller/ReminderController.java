@@ -2,6 +2,7 @@ package com.example.controller;
 
 import com.example.model.Reminder;
 import com.example.model.enumerations.ReminderType;
+import com.example.model.exceptions.ReminderNotFoundException;
 import com.example.service.impl.ReminderService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -47,8 +48,16 @@ public class ReminderController {
      * Get specific reminder by ID
      */
     @GetMapping("/{id}")
-    public ResponseEntity<Reminder> getReminderById(@PathVariable Long id) {
-        return ResponseEntity.ok(reminderService.getReminderById(id));
+    public ResponseEntity<Object> getReminderById(@PathVariable Long id) {
+        try {
+            return ResponseEntity.ok(reminderService.getReminderById(id));
+        } catch (ReminderNotFoundException e) {
+            Map<String, Object> error = new HashMap<>();
+            error.put("success", false);
+            error.put("error", e.getMessage());
+            error.put("timestamp", LocalDateTime.now().toString());
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
+        }
     }
 
     /**
