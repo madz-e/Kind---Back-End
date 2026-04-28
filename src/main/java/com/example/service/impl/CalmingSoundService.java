@@ -110,26 +110,29 @@ public class CalmingSoundService {
     // 6. Get sounds by exercise (for frontend dropdown)
     public List<Map<String, Object>> getSoundsForExerciseDropdown() {
         List<CalmingSound> allSounds = calmingSoundRepository.findAllByOrderByNameAsc();
-
         List<Map<String, Object>> dropdownOptions = new ArrayList<>();
 
         // Add "No Sound" option
-        dropdownOptions.add(Map.of(
-                "id", null,
-                "name", "No Sound",
-                "loopEnabled", false,
-                "isDefault", true
-        ));
+        Map<String, Object> noSoundOption = new HashMap<>();
+        noSoundOption.put("id", null);
+        noSoundOption.put("name", "No Sound");
+        noSoundOption.put("loopEnabled", false);
+        noSoundOption.put("isDefault", true);
+        dropdownOptions.add(noSoundOption);
 
         // Add all available sounds
-        allSounds.forEach(sound -> {
-            dropdownOptions.add(Map.of(
-                    "id", sound.getId(),
-                    "name", sound.getName(),
-                    "loopEnabled", sound.isLoopEnabled(),
-                    "isDefault", false
-            ));
-        });
+        if (allSounds != null) {
+            for (CalmingSound sound : allSounds) {
+                if (sound != null) {
+                    Map<String, Object> soundOption = new HashMap<>();
+                    soundOption.put("id", sound.getId());
+                    soundOption.put("name", sound.getName() != null ? sound.getName() : "Unknown");
+                    soundOption.put("loopEnabled", sound.isLoopEnabled());
+                    soundOption.put("isDefault", false);
+                    dropdownOptions.add(soundOption);
+                }
+            }
+        }
 
         return dropdownOptions;
     }
