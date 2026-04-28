@@ -107,12 +107,12 @@ public class MindfulnessExerciseService {
         if (soundId != null) {
             CalmingSound sound = soundService.getCalmingSoundById(soundId);
             if (sound != null) {
-                session.put("sound", Map.of(
-                        "id", sound.getId(),
-                        "name", sound.getName(),
-                        "audioUrl", sound.getAudioUrl(),
-                        "loopEnabled", sound.isLoopEnabled()
-                ));
+                Map<String, Object> soundMap = new HashMap<>();
+                soundMap.put("id", sound.getId());
+                soundMap.put("name", sound.getName() != null ? sound.getName() : "Unknown");
+                soundMap.put("audioUrl", sound.getAudioUrl());
+                soundMap.put("loopEnabled", sound.isLoopEnabled());
+                session.put("sound", soundMap);
             }
         }
 
@@ -134,22 +134,26 @@ public class MindfulnessExerciseService {
         List<Map<String, Object>> options = new ArrayList<>();
 
         // Add "No Sound" option
-        options.add(Map.of(
-                "id", null,
-                "name", "No Sound",
-                "description", "Silent meditation"
-        ));
+        Map<String, Object> noSoundOption = new HashMap<>();
+        noSoundOption.put("id", null);      // ✅ HashMap allows null
+        noSoundOption.put("name", "No Sound");
+        noSoundOption.put("loopEnabled", false);
+        noSoundOption.put("isDefault", true);
+        options.add(noSoundOption);
 
         // Add all available sounds
-        allSounds.forEach(sound -> {
-            options.add(Map.of(
-                    "id", sound.getId(),
-                    "name", sound.getName(),
-                    "description", "Calming background sound",
-                    "audioUrl", sound.getAudioUrl(),
-                    "loopEnabled", sound.isLoopEnabled()
-            ));
-        });
+        if (allSounds != null) {
+            for (CalmingSound sound : allSounds) {
+                if (sound != null) {
+                    Map<String, Object> soundOption = new HashMap<>();
+                    soundOption.put("id", sound.getId());           // ✅ Null safe
+                    soundOption.put("name", sound.getName());       // ✅ Null safe
+                    soundOption.put("loopEnabled", sound.isLoopEnabled());
+                    soundOption.put("isDefault", false);
+                    options.add(soundOption);
+                }
+            }
+        }
 
         return options;
     }
@@ -252,15 +256,19 @@ public class MindfulnessExerciseService {
     }
 
     private Map<String, Object> getCurrentSoundInfo(MindfulnessExercise exercise) {
+        Map<String, Object> soundInfo = new HashMap<>();
+
         if (exercise.getSound() == null) {
-            return Map.of("id", null, "name", "No Sound");
+            soundInfo.put("id", null);
+            soundInfo.put("name", "No Sound");
+            soundInfo.put("audioUrl", null);
+        } else {
+            soundInfo.put("id", exercise.getSound().getId());
+            soundInfo.put("name", exercise.getSound().getName());
+            soundInfo.put("audioUrl", exercise.getSound().getAudioUrl());
         }
 
-        return Map.of(
-                "id", exercise.getSound().getId(),
-                "name", exercise.getSound().getName(),
-                "audioUrl", exercise.getSound().getAudioUrl()
-        );
+        return soundInfo;
     }
 
 }
