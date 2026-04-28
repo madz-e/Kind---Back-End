@@ -1,6 +1,8 @@
 package com.example.controller;
 
 import com.example.model.Affirmation;
+import com.example.model.exceptions.AffirmationNotFoundException;
+import com.example.model.exceptions.EmptyAffirmationTextException;
 import com.example.service.impl.AffirmationService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -99,7 +101,7 @@ class AffirmationControllerTest {
     }
 
     @Test
-    void testGetAffirmationById() throws Exception {
+    void testGetAffirmationById_Success() throws Exception {
         when(affirmationService.getAffirmationById(1L)).thenReturn(testAffirmation);
 
         mockMvc.perform(get("/api/affirmations/1"))
@@ -113,17 +115,19 @@ class AffirmationControllerTest {
     @Test
     void testGetAffirmationById_NotFound() throws Exception {
         when(affirmationService.getAffirmationById(999L))
-                .thenThrow(new RuntimeException("Affirmation not found with id: 999"));
+                .thenThrow(new AffirmationNotFoundException(999L));
 
         mockMvc.perform(get("/api/affirmations/999"))
-                .andExpect(status().isOk())  // Returns 200 with error? This might need fix in controller
-                .andExpect(jsonPath("$.message").doesNotExist()); // Will fail if controller doesn't handle errors
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.success").value(false))
+                .andExpect(jsonPath("$.error").value("Affirmation with id: 999 was not found"))
+                .andExpect(jsonPath("$.timestamp").exists());
 
         verify(affirmationService, times(1)).getAffirmationById(999L);
     }
 
     @Test
-    void testCreateAffirmation() throws Exception {
+    void testCreateAffirmation_Success() throws Exception {
         Affirmation newAffirmation = new Affirmation();
         newAffirmation.setId(2L);
         newAffirmation.setAffirmationText("New affirmation");
@@ -136,7 +140,7 @@ class AffirmationControllerTest {
         mockMvc.perform(post("/api/affirmations")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(json))
-                .andExpect(status().isOk())
+                .andExpect(status().isOk())  // Your controller returns 200 OK, not 201
                 .andExpect(jsonPath("$.id").value(2))
                 .andExpect(jsonPath("$.affirmationText").value("New affirmation"));
 
@@ -146,20 +150,23 @@ class AffirmationControllerTest {
     @Test
     void testCreateAffirmation_WithEmptyText() throws Exception {
         when(affirmationService.createAffirmation(any(Affirmation.class)))
-                .thenThrow(new IllegalArgumentException("Affirmation text cannot be empty"));
+                .thenThrow(new EmptyAffirmationTextException(""));
 
         String json = "{\"affirmationText\": \"\"}";
 
         mockMvc.perform(post("/api/affirmations")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(json))
-                .andExpect(status().isOk()); // Will fail if controller doesn't handle errors
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.success").value(false))
+                .andExpect(jsonPath("$.error").value("Invalid affirmation text: ''. Affirmation text cannot be null or empty."))
+                .andExpect(jsonPath("$.timestamp").exists());
 
         verify(affirmationService, times(1)).createAffirmation(any(Affirmation.class));
     }
 
     @Test
-    void testUpdateAffirmation() throws Exception {
+    void testUpdateAffirmation_Success() throws Exception {
         Affirmation updatedAffirmation = new Affirmation();
         updatedAffirmation.setId(1L);
         updatedAffirmation.setAffirmationText("Updated text");
@@ -179,21 +186,24 @@ class AffirmationControllerTest {
     @Test
     void testUpdateAffirmation_NotFound() throws Exception {
         when(affirmationService.updateAffirmation(eq(999L), eq("New text")))
-                .thenThrow(new RuntimeException("Affirmation not found with id: 999"));
+                .thenThrow(new AffirmationNotFoundException(999L));
 
         mockMvc.perform(put("/api/affirmations/999")
                         .param("text", "New text"))
-                .andExpect(status().isOk()); // Will fail if controller doesn't handle errors
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.success").value(false))
+                .andExpect(jsonPath("$.error").value("Affirmation with id: 999 was not found"))
+                .andExpect(jsonPath("$.timestamp").exists());
 
         verify(affirmationService, times(1)).updateAffirmation(999L, "New text");
     }
 
     @Test
-    void testDeleteAffirmation() throws Exception {
+    void testDeleteAffirmation_Success() throws Exception {
         doNothing().when(affirmationService).deleteAffirmation(1L);
 
         mockMvc.perform(delete("/api/affirmations/1"))
-                .andExpect(status().isOk());
+                .andExpect(status().isOk());  // Your controller returns 200 OK with no body
 
         verify(affirmationService, times(1)).deleteAffirmation(1L);
     }
@@ -204,7 +214,10 @@ class AffirmationControllerTest {
                 .when(affirmationService).deleteAffirmation(1L);
 
         mockMvc.perform(delete("/api/affirmations/1"))
-                .andExpect(status().isOk()); // Will fail if controller doesn't handle errors
+                .andExpect(status().isConflict())
+                .andExpect(jsonPath("$.success").value(false))
+                .andExpect(jsonPath("$.error").value("Cannot delete affirmation. It is being used in reminders."))
+                .andExpect(jsonPath("$.timestamp").exists());
 
         verify(affirmationService, times(1)).deleteAffirmation(1L);
     }

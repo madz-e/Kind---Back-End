@@ -1,8 +1,11 @@
 package com.example.controller;
 
 import com.example.model.Affirmation;
+import com.example.model.exceptions.AffirmationNotFoundException;
+import com.example.model.exceptions.EmptyAffirmationTextException;
 import com.example.service.impl.AffirmationService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -19,6 +22,33 @@ import java.util.Map;
 public class AffirmationController {
 
     private final AffirmationService affirmationService;
+
+    @ExceptionHandler(AffirmationNotFoundException.class)
+    public ResponseEntity<Map<String, Object>> handleNotFound(AffirmationNotFoundException e) {
+        Map<String, Object> error = new HashMap<>();
+        error.put("success", false);
+        error.put("error", e.getMessage());
+        error.put("timestamp", LocalDateTime.now().toString());
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
+    }
+
+    @ExceptionHandler(EmptyAffirmationTextException.class)
+    public ResponseEntity<Map<String, Object>> handleEmptyText(EmptyAffirmationTextException e) {
+        Map<String, Object> error = new HashMap<>();
+        error.put("success", false);
+        error.put("error", e.getMessage());
+        error.put("timestamp", LocalDateTime.now().toString());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
+    }
+
+    @ExceptionHandler(IllegalStateException.class)
+    public ResponseEntity<Map<String, Object>> handleIllegalState(IllegalStateException e) {
+        Map<String, Object> error = new HashMap<>();
+        error.put("success", false);
+        error.put("error", e.getMessage());
+        error.put("timestamp", LocalDateTime.now().toString());
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(error);
+    }
 
     /**
      * HAS TO BE CALLED FOR AFFIRMATIONS TO WORK

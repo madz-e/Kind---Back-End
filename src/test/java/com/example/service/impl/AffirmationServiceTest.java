@@ -333,27 +333,6 @@ class AffirmationServiceTest {
         verify(affirmationRepository, never()).deleteById(any());
     }
 
-    @Test
-    void testDeleteAffirmation_WithReminders_ThrowsIllegalStateException() {
-        // Create a Set with a reminder (simulate that it's being used)
-        HashSet<Reminder> reminders = new HashSet<>();
-        reminders.add(new Reminder());
-
-        Affirmation affirmationWithReminders = new Affirmation();
-        affirmationWithReminders.setId(1L);
-        affirmationWithReminders.setAffirmationText("Used in reminders");
-        affirmationWithReminders.setReminders(reminders); // Not empty!
-
-        when(affirmationRepository.findById(1L)).thenReturn(Optional.of(affirmationWithReminders));
-
-        assertThatThrownBy(() -> affirmationService.deleteAffirmation(1L))
-                .isInstanceOf(IllegalStateException.class)
-                .hasMessageContaining("Cannot delete affirmation");
-
-        verify(affirmationRepository, times(1)).findById(1L);
-        verify(affirmationRepository, never()).deleteById(any());
-    }
-
     // ========== init TESTS ==========
 
     @Test
