@@ -19,7 +19,6 @@ public class JournalPrompt {
     private Long id;
 
     // This holds the main prompt question (for GENERAL) or the title (for ANT_EXERCISE)
-    @Lob
     @Column(nullable = false, columnDefinition = "TEXT")
     private String promptText;
 
