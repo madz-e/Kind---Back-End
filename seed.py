@@ -16,6 +16,7 @@ import requests
 import random
 import math
 import sys
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import date, timedelta
 
 random.seed(42)
@@ -109,7 +110,7 @@ JOURNAL_BLANK = {
             "I feel so alone right now. Even surrounded by people I still feel disconnected. Work has been a source of so much stress and I just don't know how much longer I can keep pushing through. I'm wondering if I should talk to someone about how I've been feeling.",
         ),
         (
-            None,
+            "Late night thoughts",
             "Can't sleep again. It's late and my mind won't stop. Worried about so many things — work, money, the future. I don't know how to make it stop. Just trying to breathe through it and get to morning.",
         ),
     ],
@@ -616,7 +617,7 @@ def _headers(token: str | None = None) -> dict:
 
 def api_post(path: str, data: dict, token: str | None = None):
     try:
-        r = requests.post(f"{BASE_URL}{path}", json=data, headers=_headers(token), timeout=15)
+        r = requests.post(f"{BASE_URL}{path}", json=data, headers=_headers(token), timeout=8)
         if r.status_code in (200, 201):
             try:
                 return r.json()
@@ -655,26 +656,42 @@ def api_post_habit_log(habit_id: int, date_str: str, completed: bool, token: str
             f"{BASE_URL}/api/habits/{habit_id}/logs/date/{date_str}",
             params={"completed": str(completed).lower()},
             headers=_headers(token),
-            timeout=15,
+            timeout=8,
         )
-        return r.status_code in (200, 201)
-    except Exception:
+        if r.status_code in (200, 201):
+            return True
+        print(f"  WARN HABIT LOG habit={habit_id} date={date_str} -> {r.status_code}: {r.text[:120]}")
+        return False
+    except Exception as e:
+        print(f"  ERROR HABIT LOG habit={habit_id} date={date_str}: {e}")
         return False
 
 
 # ==================== REFERENCE DATA SEEDING ====================
 
-def seed_reference_data():
+def get_seed_token() -> str | None:
+    """Register (or login) a throwaway seed user and return their JWT token.
+    This token is used only to create shared reference data that requires auth."""
+    creds = {"name": "Seed Admin", "email": "seed.admin@kind.com", "password": "SeedAdmin1!"}
+    result = api_post("/api/register", creds)
+    if result and result.get("token"):
+        return result["token"]
+    # Already registered — log in
+    result = api_post("/api/login", {"email": creds["email"], "password": creds["password"]})
+    return result.get("token") if result else None
+
+
+def seed_reference_data(token: str):
     """Seed or fetch emotions, mood factors, journal prompts, and init system data."""
     print("\n=== Seeding reference data ===")
 
-    # System init (idempotent)
-    api_post("/api/affirmations/init", {})
-    api_post("/api/exercises/initialize", {})
+    # System init (idempotent endpoints)
+    api_post("/api/affirmations/init", {}, token)
+    api_post("/api/exercises/initialize", {}, token)
     print("  System data initialized (affirmations, exercises)")
 
     # --- Emotions ---
-    existing = api_get("/api/emotions") or []
+    existing = api_get("/api/emotions", token) or []
     emotions_by_category: dict[str, list] = {}
     if existing:
         print(f"  Found {len(existing)} existing emotions — reusing")
@@ -684,14 +701,14 @@ def seed_reference_data():
     else:
         print("  Creating emotions…")
         for em in EMOTIONS_DATA:
-            result = api_post("/api/emotions", em)
+            result = api_post("/api/emotions", em, token)
             if result:
                 cat = result.get("moodCategory", em["moodCategory"])
                 emotions_by_category.setdefault(cat, []).append({"id": result["id"]})
         print(f"    {sum(len(v) for v in emotions_by_category.values())} emotions created")
 
     # --- Mood Factors ---
-    existing = api_get("/api/mood-factors") or []
+    existing = api_get("/api/mood-factors", token) or []
     all_factors: list[dict] = []
     if existing:
         print(f"  Found {len(existing)} existing mood factors — reusing")
@@ -699,13 +716,13 @@ def seed_reference_data():
     else:
         print("  Creating mood factors…")
         for mf in MOOD_FACTORS_DATA:
-            result = api_post("/api/mood-factors", mf)
+            result = api_post("/api/mood-factors", mf, token)
             if result:
                 all_factors.append({"id": result["id"]})
         print(f"    {len(all_factors)} mood factors created")
 
     # --- Journal Prompts ---
-    existing = api_get("/api/journal-prompts") or []
+    existing = api_get("/api/journal-prompts", token) or []
     prompt_ids: list[int] = []
     prompts_by_text: dict[str, int] = {}
     ant_prompt_ids: list[int] = []
@@ -725,7 +742,7 @@ def seed_reference_data():
     else:
         print("  Creating journal prompts…")
         for jp in JOURNAL_PROMPTS_DATA:
-            result = api_post("/api/journal-prompts", jp)
+            result = api_post("/api/journal-prompts", jp, token)
             if result:
                 pid = result["id"]
                 text = jp["promptText"]
@@ -850,13 +867,12 @@ def seed_user(user_data: dict, emotions_by_category: dict, all_factors: list,
                                 content = random.choice(ANT_JOURNAL_CONTENT)
 
                         journal_payload = {
-                            "createdAt":    date_str,
-                            "title":        None,
-                            "content":      content,
-                            "type":         "PROMPT_BASED",
-                            "user":         {"id": user_id},
-                            "moodEntry":    {"id": mood_result["id"]},
-                            "journalPrompt":{"id": prompt_id},
+                            "createdAt":     date_str,
+                            "title":         None,
+                            "content":       content,
+                            "type":          "PROMPT_BASED",
+                            "user":          {"id": user_id},
+                            "journalPrompt": {"id": prompt_id},
                         }
                     else:
                         title, content = pick_journal_blank(mood_val)
@@ -866,7 +882,6 @@ def seed_user(user_data: dict, emotions_by_category: dict, all_factors: list,
                             "content":   content,
                             "type":      "BLANK",
                             "user":      {"id": user_id},
-                            "moodEntry": {"id": mood_result["id"]},
                         }
 
                     if api_post("/api/journal-entries", journal_payload, token):
@@ -899,7 +914,7 @@ def main():
     print(f"Period  : {start_date}  →  {end_date}  ({(end_date - start_date).days + 1} days)")
     print()
 
-    # Connectivity check
+    # Connectivity check (401 is fine — server is up, just requires auth)
     try:
         r = requests.get(f"{BASE_URL}/api/affirmations", timeout=5)
         print(f"Backend reachable (HTTP {r.status_code})")
@@ -909,9 +924,19 @@ def main():
         print("       Make sure the Spring Boot app is running first.")
         sys.exit(1)
 
-    emotions_by_category, all_factors, ant_prompt_ids, general_prompts = seed_reference_data()
+    # Get a token for seeding shared reference data
+    print("Acquiring seed token…")
+    seed_token = get_seed_token()
+    if not seed_token:
+        print("ERROR: Could not register or login the seed admin user — aborting.")
+        sys.exit(1)
+    print(f"Seed token acquired (...{seed_token[-8:]})")
 
-    for user_data in USERS_DATA:
+    emotions_by_category, all_factors, ant_prompt_ids, general_prompts = seed_reference_data(seed_token)
+
+    print(f"\nSeeding {len(USERS_DATA)} users in parallel (4 at a time)…\n")
+
+    def seed_one(user_data):
         seed_user(
             user_data,
             emotions_by_category,
@@ -921,6 +946,15 @@ def main():
             start_date,
             end_date,
         )
+
+    with ThreadPoolExecutor(max_workers=4) as executor:
+        futures = {executor.submit(seed_one, u): u["register"]["name"] for u in USERS_DATA}
+        for future in as_completed(futures):
+            name = futures[future]
+            try:
+                future.result()
+            except Exception as e:
+                print(f"  ERROR seeding {name}: {e}")
 
     print()
     print("=" * 55)

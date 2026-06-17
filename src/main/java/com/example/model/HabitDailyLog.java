@@ -1,5 +1,6 @@
 package com.example.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -22,6 +23,7 @@ public class HabitDailyLog {
     @Column(nullable = false)
     private boolean completed;
 
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler", "dailyLogs", "user"})
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "habit_id", nullable = false)
     private Habit habit;
