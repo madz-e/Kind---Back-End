@@ -33,28 +33,48 @@ EMOTIONS_DATA = [
     {"name": "Hopeless",      "moodCategory": "VERY_UNPLEASANT"},
     {"name": "Terrified",     "moodCategory": "VERY_UNPLEASANT"},
     {"name": "Miserable",     "moodCategory": "VERY_UNPLEASANT"},
+    {"name": "Grief-stricken","moodCategory": "VERY_UNPLEASANT"},  # NEW
+    {"name": "Panicked",      "moodCategory": "VERY_UNPLEASANT"},  # NEW
+    {"name": "Numb",          "moodCategory": "VERY_UNPLEASANT"},  # NEW
+    {"name": "Heartbroken",   "moodCategory": "VERY_UNPLEASANT"},  # NEW
     {"name": "Sad",           "moodCategory": "UNPLEASANT"},
     {"name": "Anxious",       "moodCategory": "UNPLEASANT"},
     {"name": "Frustrated",    "moodCategory": "UNPLEASANT"},
     {"name": "Overwhelmed",   "moodCategory": "UNPLEASANT"},
     {"name": "Lonely",        "moodCategory": "UNPLEASANT"},
     {"name": "Worried",       "moodCategory": "UNPLEASANT"},
+    {"name": "Irritated",     "moodCategory": "UNPLEASANT"},  # NEW
+    {"name": "Disappointed",  "moodCategory": "UNPLEASANT"},  # NEW
+    {"name": "Insecure",      "moodCategory": "UNPLEASANT"},  # NEW
+    {"name": "Restless",      "moodCategory": "UNPLEASANT"},  # NEW
     {"name": "Okay",          "moodCategory": "NEUTRAL"},
     {"name": "Calm",          "moodCategory": "NEUTRAL"},
     {"name": "Indifferent",   "moodCategory": "NEUTRAL"},
     {"name": "Tired",         "moodCategory": "NEUTRAL"},
     {"name": "Contemplative", "moodCategory": "NEUTRAL"},
+    {"name": "Curious",       "moodCategory": "NEUTRAL"},  # NEW
+    {"name": "Distracted",    "moodCategory": "NEUTRAL"},  # NEW
+    {"name": "Bored",         "moodCategory": "NEUTRAL"},  # NEW
+    {"name": "Reflective",    "moodCategory": "NEUTRAL"},  # NEW
     {"name": "Happy",         "moodCategory": "PLEASANT"},
     {"name": "Energetic",     "moodCategory": "PLEASANT"},
     {"name": "Grateful",      "moodCategory": "PLEASANT"},
     {"name": "Hopeful",       "moodCategory": "PLEASANT"},
     {"name": "Content",       "moodCategory": "PLEASANT"},
     {"name": "Relaxed",       "moodCategory": "PLEASANT"},
+    {"name": "Proud",         "moodCategory": "PLEASANT"},  # NEW
+    {"name": "Motivated",     "moodCategory": "PLEASANT"},  # NEW
+    {"name": "Optimistic",    "moodCategory": "PLEASANT"},  # NEW
+    {"name": "Playful",       "moodCategory": "PLEASANT"},  # NEW
     {"name": "Joyful",        "moodCategory": "VERY_PLEASANT"},
     {"name": "Excited",       "moodCategory": "VERY_PLEASANT"},
     {"name": "Inspired",      "moodCategory": "VERY_PLEASANT"},
     {"name": "Ecstatic",      "moodCategory": "VERY_PLEASANT"},
     {"name": "Blissful",      "moodCategory": "VERY_PLEASANT"},
+    {"name": "Euphoric",      "moodCategory": "VERY_PLEASANT"},  # NEW
+    {"name": "Triumphant",    "moodCategory": "VERY_PLEASANT"},  # NEW
+    {"name": "Radiant",       "moodCategory": "VERY_PLEASANT"},  # NEW
+    {"name": "Overjoyed",     "moodCategory": "VERY_PLEASANT"},  # NEW
 ]
 
 MOOD_FACTORS_DATA = [
