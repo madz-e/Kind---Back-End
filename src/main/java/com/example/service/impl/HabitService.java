@@ -1,5 +1,6 @@
 package com.example.service.impl;
 
+import com.example.jpaRepository.HabitDailyLogRepository;   // CHANGED: to clear child logs on delete
 import com.example.jpaRepository.HabitRepository;
 import com.example.model.Habit;
 import com.example.model.User;
@@ -19,6 +20,7 @@ import java.util.Map;
 @Transactional
 public class HabitService {
     private final HabitRepository habitRepository;
+    private final HabitDailyLogRepository habitDailyLogRepository;   // CHANGED
     private final UserService userService;
 
     // 1. Create custom habit (user creates their own)
@@ -46,7 +48,16 @@ public class HabitService {
 
     // 3. Delete ANY habit (user can delete premade or custom)
     public void deleteHabit(Long habitId) {
-        habitRepository.deleteById(habitId);
+        // CHANGED: was `habitRepository.deleteById(habitId)`, which 500'd for any habit
+        //          that already had completion logs (every default habit, once ticked off):
+        //          the habit_daily_log FK has no ON DELETE CASCADE under ddl-auto=update,
+        //          so Postgres rejected the parent delete.
+        // Now: verify it exists (→ 404, not a silent no-op), wipe its logs, then delete it.
+        Habit habit = habitRepository.findById(habitId)
+                .orElseThrow(() -> new HabitNotFoundException(habitId));
+
+        habitDailyLogRepository.deleteByHabitId(habitId);   // CHANGED: clear children first
+        habitRepository.delete(habit);                      // CHANGED: now safe for default habits
     }
 
 

@@ -1,5 +1,6 @@
 package com.example.service.impl;
 
+import com.example.jpaRepository.HabitDailyLogRepository;   // CHANGED
 import com.example.jpaRepository.HabitRepository;
 import com.example.model.Habit;
 import com.example.model.User;
@@ -26,6 +27,9 @@ public class HabitServiceTest {
 
     @Mock
     private HabitRepository habitRepository;
+
+    @Mock
+    private HabitDailyLogRepository habitDailyLogRepository;
 
     @Mock
     private UserService userService;
@@ -134,11 +138,14 @@ public class HabitServiceTest {
 
     @Test
     public void testDeleteHabit_Success() {
-        doNothing().when(habitRepository).deleteById(1L);
+        // CHANGED: delete now looks the habit up, clears its logs, then removes it
+        //          (the old path called deleteById and 500'd on habits that had logs).
+        when(habitRepository.findById(1L)).thenReturn(Optional.of(testHabit));
 
         habitService.deleteHabit(1L);
 
-        verify(habitRepository, times(1)).deleteById(1L);
+        verify(habitDailyLogRepository, times(1)).deleteByHabitId(1L);
+        verify(habitRepository, times(1)).delete(testHabit);
     }
 
     @Test

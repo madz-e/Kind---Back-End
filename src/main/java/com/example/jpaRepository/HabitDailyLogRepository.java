@@ -2,6 +2,7 @@ package com.example.jpaRepository;
 
 import com.example.model.HabitDailyLog;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;   // CHANGED: needed for bulk delete
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -13,6 +14,13 @@ import java.util.Optional;
 
 @Repository
 public interface HabitDailyLogRepository extends JpaRepository<HabitDailyLog, Long> {
+
+    // CHANGED: bulk-delete every log belonging to a habit, so a habit that has
+    //          completion logs (i.e. the default habits, which users actually tick off)
+    //          can be removed without hitting the habit_daily_log FK constraint → 500.
+    @Modifying
+    @Query("DELETE FROM HabitDailyLog h WHERE h.habit.id = :habitId")
+    void deleteByHabitId(@Param("habitId") Long habitId);
 
     // Get log for specific habit and date
     Optional<HabitDailyLog> findByHabitIdAndDate(Long habitId, LocalDate date);

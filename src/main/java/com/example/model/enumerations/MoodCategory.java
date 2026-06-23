@@ -28,6 +28,6 @@ public enum MoodCategory {
                 return category;
             }
         }
-        throw new IllegalArgumentException("Invalid mood value: " + moodValue + ". Must be between 1 and 10.");
+        throw new IllegalArgumentException("Invalid mood value: " + moodValue + ". Must be between 1 and 5.");
     }
 }
