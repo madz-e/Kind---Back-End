@@ -54,7 +54,7 @@ public class MoodEntry {
     )
     private Set<MoodFactor> selectedFactors = new HashSet<>();
 
-    // TODO optional!!!
+    @com.fasterxml.jackson.annotation.JsonIgnore
     @OneToOne(mappedBy = "moodEntry", fetch = FetchType.LAZY)
     private JournalEntry journalEntry;
 

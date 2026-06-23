@@ -35,13 +35,15 @@ public class JournalEntry {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler", "journalEntry", "moodEntries", "journalEntries", "habits", "reminders", "selectedEmotions", "selectedFactors"})
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "mood_entry_id", unique = true)
-    private MoodEntry moodEntry; // Relationship: One-to-One with MoodEntry (Optional)
+    private MoodEntry moodEntry;
 
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler", "journalEntries"})
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "prompt_id")
-    private JournalPrompt journalPrompt; // Relationship: Many-to-One wi
+    private JournalPrompt journalPrompt;
 
 
 }
