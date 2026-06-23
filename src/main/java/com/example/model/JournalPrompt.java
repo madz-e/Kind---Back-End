@@ -25,6 +25,7 @@ public class JournalPrompt {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private JournalPromptType type;
+    @com.fasterxml.jackson.annotation.JsonIgnore
     @OneToMany(mappedBy = "journalPrompt")
     private Set<JournalEntry> journalEntries;
 
