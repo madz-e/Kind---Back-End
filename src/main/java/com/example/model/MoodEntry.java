@@ -4,20 +4,27 @@ import com.example.model.enumerations.MoodCategory;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 
 import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Set;
 
 @Entity
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
+@ToString(exclude = {"user", "journalEntry", "selectedEmotions", "selectedFactors"})
 public class MoodEntry {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @EqualsAndHashCode.Include
     private Long id;
 
     @Column(nullable = false)
@@ -33,7 +40,7 @@ public class MoodEntry {
 
     private String note;
 
-    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"}) // ADDED: skip Hibernate proxy internals so JSON serialization works
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler", "moodEntries", "journalEntries", "habits", "reminders", "password", "authorities"})
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
@@ -64,5 +71,3 @@ public class MoodEntry {
         this.moodCategory = MoodCategory.fromValue(moodValue);
     }
 }
-
-

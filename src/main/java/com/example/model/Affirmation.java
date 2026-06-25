@@ -1,5 +1,6 @@
 package com.example.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -20,6 +21,7 @@ public class Affirmation {
     @Column(nullable = false)
     private String affirmationText;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "linkedAffirmation")
     private Set<Reminder> reminders;
 }

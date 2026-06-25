@@ -1,5 +1,6 @@
 package com.example.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -25,6 +26,7 @@ public class CalmingSound {
     @Column(nullable = false)
     private boolean loopEnabled;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "sound", fetch = FetchType.LAZY)
     private Set<MindfulnessExercise> exercises;
 }

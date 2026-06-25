@@ -34,7 +34,7 @@ public class Habit {
     @Column(name = "is_system_habit", nullable = false)
     private Boolean isSystemHabit = false;
 
-    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler", "moodEntries", "journalEntries", "habits", "reminders", "password", "authorities"})
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
