@@ -138,6 +138,11 @@ public class JournalEntryServiceImpl implements JournalEntryService {
                 existingEntry.setTitle(updatedEntry.getTitle());
             }
         }
+
+        // Update structured payload (e.g. edited CBT thought record) when provided
+        if (updatedEntry.getStructuredData() != null) {
+            existingEntry.setStructuredData(updatedEntry.getStructuredData());
+        }
         return journalEntryRepository.save(existingEntry);
     }
 
