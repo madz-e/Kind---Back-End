@@ -4,25 +4,18 @@ import com.example.model.enumerations.EntryType;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
+import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
 
 import java.time.LocalDate;
 
 @Entity
-@Getter
-@Setter
+@Data
 @NoArgsConstructor
 @AllArgsConstructor
-@EqualsAndHashCode(onlyExplicitlyIncluded = true)
-@ToString(exclude = {"user", "moodEntry", "journalPrompt"})
 public class JournalEntry {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @EqualsAndHashCode.Include
     private Long id;
 
     @Column(name = "created_at",nullable = false)
@@ -51,6 +44,11 @@ public class JournalEntry {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "prompt_id")
     private JournalPrompt journalPrompt;
+
+    // Structured payload for special multi-field prompts (e.g. CBT thought record).
+    // Holds JSON; null for ordinary entries.
+    @Column(columnDefinition = "TEXT")
+    private String structuredData;
 
 
 }
