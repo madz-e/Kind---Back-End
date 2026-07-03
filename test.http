@@ -975,3 +975,11 @@ Content-Type: application/json
 }
 
 ###
+
+### ── INSIGHTS ────────────────────────────────────────────────────
+
+### [115] Get today's AI mood insight for the authenticated user
+GET {{baseUrl}}/api/insights/today
+Authorization: Bearer {{token}}
+
+###
