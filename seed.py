@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+from __future__ import annotations
 """
 Kind Mental Health App - Database Seeder
 Seeds 10 users with ~4 months of historical data suitable for LLM analysis.
@@ -516,6 +517,11 @@ USERS_DATA = [
     },
 ]
 
+# ==================== BREATHING SESSION GENERATION ====================
+
+BREATHING_EXERCISE_TYPES = ["box", "478", "calm"]
+BREATHING_FREQUENCY = 0.35  # baseline chance of a logged breathing session on a given day
+
 # ==================== MOOD VALUE GENERATION ====================
 
 def mood_value_for_pattern(pattern: str, day_idx: int, total: int) -> int:
@@ -835,7 +841,7 @@ def seed_user(user_data: dict, emotions_by_category: dict, all_factors: list,
     print(f"  Created {len(habit_specs)} habits")
 
     total_days = (end_date - start_date).days + 1
-    mood_count = journal_count = log_count = 0
+    mood_count = journal_count = log_count = breathing_count = 0
 
     for day_idx in range(total_days):
         current = start_date + timedelta(days=day_idx)
@@ -859,53 +865,66 @@ def seed_user(user_data: dict, emotions_by_category: dict, all_factors: list,
             if mood_result:
                 mood_count += 1
 
-                # ---- Journal entry ----
-                if random.random() < user_data["journal_frequency"]:
-                    use_prompt = random.random() < 0.35
+            # ---- Journal entry ----
+            # Independent of whether the mood post above succeeded — a failed/rejected
+            # mood entry shouldn't also cost that day's journal entry.
+            if random.random() < user_data["journal_frequency"]:
+                use_prompt = random.random() < 0.35
 
-                    if use_prompt and (general_prompts or ant_prompt_ids):
-                        # ANT exercise: 25% chance when mood is low
-                        use_ant = (
-                            random.random() < 0.25
-                            and mood_val <= 5
-                            and ant_prompt_ids
-                        )
-                        if use_ant:
-                            prompt_id = random.choice(ant_prompt_ids)
-                            content = random.choice(ANT_JOURNAL_CONTENT)
-                        else:
-                            if general_prompts:
-                                prompt_text, prompt_id = random.choice(general_prompts)
-                                options = PROMPT_JOURNAL_CONTENT.get(prompt_text, [])
-                                if isinstance(options, list) and options:
-                                    chosen = random.choice(options)
-                                    content = chosen if isinstance(chosen, str) else random.choice(ANT_JOURNAL_CONTENT)
-                                else:
-                                    content = "Reflecting on today's prompt."
-                            else:
-                                prompt_id = ant_prompt_ids[0]
-                                content = random.choice(ANT_JOURNAL_CONTENT)
-
-                        journal_payload = {
-                            "createdAt":     date_str,
-                            "title":         None,
-                            "content":       content,
-                            "type":          "PROMPT_BASED",
-                            "user":          {"id": user_id},
-                            "journalPrompt": {"id": prompt_id},
-                        }
+                if use_prompt and (general_prompts or ant_prompt_ids):
+                    # ANT exercise: 25% chance when mood is low
+                    use_ant = (
+                        random.random() < 0.25
+                        and mood_val <= 5
+                        and ant_prompt_ids
+                    )
+                    if use_ant:
+                        prompt_id = random.choice(ant_prompt_ids)
+                        content = random.choice(ANT_JOURNAL_CONTENT)
                     else:
-                        title, content = pick_journal_blank(mood_val)
-                        journal_payload = {
-                            "createdAt": date_str,
-                            "title":     title,
-                            "content":   content,
-                            "type":      "BLANK",
-                            "user":      {"id": user_id},
-                        }
+                        if general_prompts:
+                            prompt_text, prompt_id = random.choice(general_prompts)
+                            options = PROMPT_JOURNAL_CONTENT.get(prompt_text, [])
+                            if isinstance(options, list) and options:
+                                chosen = random.choice(options)
+                                content = chosen if isinstance(chosen, str) else random.choice(ANT_JOURNAL_CONTENT)
+                            else:
+                                content = "Reflecting on today's prompt."
+                        else:
+                            prompt_id = ant_prompt_ids[0]
+                            content = random.choice(ANT_JOURNAL_CONTENT)
 
-                    if api_post("/api/journal-entries", journal_payload, token):
-                        journal_count += 1
+                    journal_payload = {
+                        "createdAt":     date_str,
+                        "title":         None,
+                        "content":       content,
+                        "type":          "PROMPT_BASED",
+                        "user":          {"id": user_id},
+                        "journalPrompt": {"id": prompt_id},
+                    }
+                else:
+                    title, content = pick_journal_blank(mood_val)
+                    journal_payload = {
+                        "createdAt": date_str,
+                        "title":     title,
+                        "content":   content,
+                        "type":      "BLANK",
+                        "user":      {"id": user_id},
+                    }
+
+                if api_post("/api/journal-entries", journal_payload, token):
+                    journal_count += 1
+
+        # ---- Breathing session ----
+        if random.random() < BREATHING_FREQUENCY:
+            breathing_payload = {
+                "date":         date_str,
+                "exerciseType": random.choice(BREATHING_EXERCISE_TYPES),
+                "cycles":       random.randint(2, 8),
+                "user":         {"id": user_id},
+            }
+            if api_post("/api/breathing-sessions", breathing_payload, token):
+                breathing_count += 1
 
         # ---- Habit daily logs ----
         for habit_id, completion_rate in habit_specs:
@@ -915,9 +934,11 @@ def seed_user(user_data: dict, emotions_by_category: dict, all_factors: list,
 
         if (day_idx + 1) % 30 == 0:
             print(f"    Day {day_idx+1}/{total_days}: "
-                  f"{mood_count} moods | {journal_count} journals | {log_count} habit logs")
+                  f"{mood_count} moods | {journal_count} journals | "
+                  f"{breathing_count} breathing sessions | {log_count} habit logs")
 
-    print(f"  DONE — {mood_count} mood entries, {journal_count} journal entries, {log_count} habit logs")
+    print(f"  DONE — {mood_count} mood entries, {journal_count} journal entries, "
+          f"{breathing_count} breathing sessions, {log_count} habit logs")
 
 
 # ==================== MAIN ====================
