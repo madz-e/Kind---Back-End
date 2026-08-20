@@ -30,12 +30,12 @@ public class JournalEntry {
     @Column(nullable = false)
     private EntryType type;
 
-    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler", "moodEntries", "journalEntries", "habits", "reminders", "password", "authorities"})
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler", "moodEntries", "journalEntries", "habits", "reminders", "breathingSessions", "password", "authorities"})
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler", "journalEntry", "moodEntries", "journalEntries", "habits", "reminders", "selectedEmotions", "selectedFactors"})
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler", "journalEntry", "moodEntries", "journalEntries", "habits", "reminders", "breathingSessions", "selectedEmotions", "selectedFactors"})
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "mood_entry_id", unique = true)
     private MoodEntry moodEntry;
