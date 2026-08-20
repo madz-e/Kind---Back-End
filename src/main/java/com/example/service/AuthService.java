@@ -32,11 +32,12 @@ public class AuthService {
                 .lastName("")
                 .email(request.getEmail())
                 .password(passwordEncoder.encode(request.getPassword()))
+                .animal(request.getAnimal())
                 .createdAt(LocalDateTime.now())
                 .build();
         userRepository.save(user);
         String token = jwtService.generateToken(user);
-        return new AuthResponse(token, user.getId(), user.getFirstName(), user.getEmail());
+        return new AuthResponse(token, user.getId(), user.getFirstName(), user.getEmail(), user.getAnimal());
     }
 
     public AuthResponse login(LoginRequest request) {
@@ -46,6 +47,6 @@ public class AuthService {
         User user = userRepository.findByEmail(request.getEmail())
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));
         String token = jwtService.generateToken(user);
-        return new AuthResponse(token, user.getId(), user.getFirstName(), user.getEmail());
+        return new AuthResponse(token, user.getId(), user.getFirstName(), user.getEmail(), user.getAnimal());
     }
 }

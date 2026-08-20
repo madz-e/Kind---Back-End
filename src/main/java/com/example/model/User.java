@@ -41,6 +41,9 @@ public class User implements UserDetails {
     @Column(name = "last_name", nullable = false)
     private String lastName;
 
+    @Column(name = "animal")
+    private String animal;
+
     @Column(name = "completed_intro")
     @Builder.Default
     private Boolean completedIntro = false;
