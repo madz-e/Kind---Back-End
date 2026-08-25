@@ -18,4 +18,8 @@ public class RegisterRequest {
         message = "Password must contain at least one uppercase letter, one lowercase letter, and one number"
     )
     private String password;
+
+    // Companion animal picked during onboarding, sent along at signup so it
+    // survives reinstalls / new devices instead of living only in local storage.
+    private String animal;
 }
