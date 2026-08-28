@@ -18,6 +18,7 @@ public class InsightServiceImpl implements InsightService {
     private final RuleBasedInsightServiceImpl ruleBasedInsightService;
     private final OpenAiClient openAiClient;
     private final ObjectMapper objectMapper;
+    private final OllamaClient ollamaClient;
 
     @Override
     public InsightResponse generateInsight(User user) {
@@ -35,7 +36,8 @@ public class InsightServiceImpl implements InsightService {
         }
 
         try {
-            String json = openAiClient.getRecommendation(ctx, rule);
+//            String json = openAiClient.getRecommendation(ctx, rule);
+            String json = ollamaClient.getRecommendation(ctx, rule);
             JsonNode node = objectMapper.readTree(json);
             String feelingSummary = node.get("feeling_summary").asText();
             String recommendation = node.get("recommendation").asText();
